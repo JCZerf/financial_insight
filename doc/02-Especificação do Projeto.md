@@ -333,7 +333,7 @@ A priorização dos requisitos considerou o tempo disponível para desenvolvimen
 | RNF-005 | O sistema deve permanecer disponível para consulta dos dados já armazenados mesmo diante de falhas pontuais no processo de coleta | Must have |
 | RNF-006 | O código da aplicação deve ser organizado de forma modular, com separação clara entre frontend, backend e processo de coleta | Should have |
 | RNF-007 | O sistema deve garantir rastreabilidade das coletas e dos alertas por meio de status, logs ou métricas operacionais | Should have |
-| RNF-008 | O sistema deve armazenar os dados de forma persistente e consistente em banco de dados relacional | Must have |
+| RNF-008 | O sistema deve armazenar os dados de forma persistente e consistente em banco de dados PostgreSQL | Must have |
 | RNF-009 | O sistema deve tratar indisponibilidade temporária de fontes externas sem comprometer a integridade dos dados já armazenados | Should have |
 
 ### Restrições

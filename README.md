@@ -19,13 +19,14 @@ Plataforma para coleta, organização e visualização de dados do mercado finan
 - Documentação de contexto e especificação já estruturadas.
 - Projeto Django inicializado.
 - Aplicação `api` criada para evolução do backend.
-- Banco SQLite configurado para a fase inicial de desenvolvimento.
+- Stack técnica definida com Python, Django, PostgreSQL e Playwright.
 - Scraping, dashboard e observabilidade ainda em evolução.
 
 ## Stack Atual e Planejada
+- Linguagem base: Python.
 - Backend/API: Django.
-- Banco de dados: SQLite na fase inicial, com possibilidade de evolução para outro banco relacional.
-- Automação/Scraping: planejado.
+- Banco de dados: PostgreSQL.
+- Automação/Scraping: Playwright.
 - Frontend/Dashboard: planejado.
 - Observabilidade: planejada.
 

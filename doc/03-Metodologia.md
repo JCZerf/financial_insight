@@ -24,7 +24,7 @@ Objetivos específicos:
 
 Desenvolver um Bot de RPA/Scraping autônomo para mapear e extrair indicadores diários de fontes públicas (Fundamentus).
 
-Construir uma API RESTful (Django) estruturada para processar as regras de negócio e armazenar o histórico de cotações em um banco de dados relacional.
+Construir uma API RESTful (Django) estruturada para processar as regras de negócio e armazenar o histórico de cotações em banco de dados PostgreSQL.
 
 Criar um Dashboard Web (Frontend) intuitivo para o usuário visualizar as "Pechinchas" (ativos baratos e pagadores de bons dividendos).
 
