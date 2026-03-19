@@ -1,19 +1,39 @@
 # FinancialInsight
 
-Plataforma/bot para coleta de dados do site Fundamentus, organização de indicadores de empresas e visualização em dashboard para apoiar decisões financeiras.
+Plataforma para coleta, organização e visualização de dados do mercado financeiro, com foco inicial na análise de Fundos Imobiliários (FIIs) para apoiar decisões de investimento orientadas por dados.
 
 ## Visão Geral
-- Coleta automatizada de dados públicos do Fundamentus.
-- Processamento e armazenamento dos indicadores.
-- API em Django para expor dados e regras de negócio.
-- Dashboard para visualização e análise.
+- Coleta automatizada de dados públicos de fontes financeiras.
+- Processamento, normalização e armazenamento de indicadores.
+- API backend para expor dados e regras de negócio.
+- Dashboard para visualização, análise e monitoramento de oportunidades.
+- Estrutura pensada para apoiar filtros, ranking de ativos e alertas.
 
-## Stack Inicial (Planejada)
-- Backend/API: Django REST Framework.
-- Automação/Scraping: Playwright.
-- Banco de dados: relacional (a definir).
-- Observabilidade: Grafana/Prometheus (planejado).
-- Frontend/Dashboard: a definir.
+## Escopo Inicial
+- Análise de FIIs com base em indicadores como P/VP, Dividend Yield e Liquidez.
+- Identificação de oportunidades por meio de ranking e filtros.
+- Monitoramento de ativos com condições definidas pelo usuário.
+- Geração de alertas para apoiar o acompanhamento do mercado.
+
+## Estado Atual
+- Documentação de contexto e especificação já estruturadas.
+- Projeto Django inicializado.
+- Aplicação `api` criada para evolução do backend.
+- Banco SQLite configurado para a fase inicial de desenvolvimento.
+- Scraping, dashboard e observabilidade ainda em evolução.
+
+## Stack Atual e Planejada
+- Backend/API: Django.
+- Banco de dados: SQLite na fase inicial, com possibilidade de evolução para outro banco relacional.
+- Automação/Scraping: planejado.
+- Frontend/Dashboard: planejado.
+- Observabilidade: planejada.
+
+## Estrutura do Repositório
+- `financial_insight/`: configuração principal do projeto Django.
+- `api/`: aplicação backend para modelos, views e evolução da API.
+- `doc/`: documentação do projeto.
+- `manage.py`: ponto de entrada para comandos do Django.
 
 ## Documentação
 - Contexto do projeto: `doc/01-Documentação de Contexto.md`.
@@ -21,4 +41,4 @@ Plataforma/bot para coleta de dados do site Fundamentus, organização de indica
 - Metodologia: `doc/03-Metodologia.md`.
 
 ## Status
-Em fase inicial de definição e organização da documentação.
+Projeto em fase inicial de estruturação, com documentação já consolidando escopo, requisitos e visão do produto para guiar o desenvolvimento incremental.
