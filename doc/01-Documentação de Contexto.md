@@ -1,41 +1,66 @@
 # Documentação de Contexto: Projeto FinancialInsight
 
 ## Introdução
-Nos últimos anos, a bolsa de valores brasileira (B3) registrou um aumento histórico no número de investidores pessoa física (CPFs), impulsionado pela busca por rentabilidade superior à renda fixa tradicional e pela construção de renda passiva (dividendos). Apesar da democratização do acesso às corretoras, a inteligência e a análise de dados financeiros ainda são barreiras para a maioria da população.
 
-Enquanto investidores institucionais possuem robôs e terminais caros (como a Bloomberg) para filtrar os melhores ativos, o investidor de varejo depende de análises manuais em planilhas ou de relatórios genéricos. Neste contexto, este projeto propõe o desenvolvimento da FinancialInsight, uma plataforma web automatizada que atua como um "Radar de Oportunidades", extraindo dados públicos do mercado, aplicando modelos matemáticos de valuation e entregando as melhores opções de investimento de forma mastigada e visual.
+Nos últimos anos, a bolsa de valores brasileira, operada pela B3, registrou um crescimento expressivo no número de investidores pessoa física (CPFs), impulsionado principalmente pela redução das taxas de juros e pela busca por alternativas mais rentáveis em relação à renda fixa tradicional.
+
+Além disso, observa-se uma crescente preocupação com a construção de renda passiva, especialmente por meio do recebimento de dividendos, estratégia amplamente difundida no mercado financeiro como forma de geração de fluxo de caixa recorrente para investidores de longo prazo.
+
+Apesar da democratização do acesso às corretoras e plataformas digitais, a capacidade de análise de dados financeiros ainda representa uma barreira significativa para a maioria da população. Segundo estudos da ANBIMA, grande parte dos investidores brasileiros possui baixo nível de educação financeira, o que dificulta a tomada de decisões embasadas e aumenta a dependência de conteúdos genéricos ou recomendações pouco personalizadas.
+
+Enquanto investidores institucionais contam com ferramentas avançadas de análise, como os terminais da Bloomberg L.P., que oferecem acesso a dados em tempo real, indicadores sofisticados e modelos analíticos robustos, o investidor de varejo geralmente depende de planilhas manuais, relatórios públicos ou plataformas com limitações analíticas.
+
+Nesse contexto, este projeto propõe o desenvolvimento da **FinancialInsight**, uma plataforma web automatizada que atua como um “Radar de Oportunidades”, capaz de extrair dados públicos do mercado financeiro, aplicar modelos matemáticos de valuation e apresentar, de forma simplificada e visual, as melhores opções de investimento, reduzindo a complexidade analítica e ampliando o acesso à inteligência de mercado.
 
 ## Problema
-Segundo dados da B3, milhões de brasileiros investem atualmente em Ações e Fundos Imobiliários (FIIs). Contudo, a jornada de escolha dos ativos é complexa e exaustiva.
 
-Atualmente, o investidor precisa acessar portais de dados financeiros (como o Fundamentus), exportar planilhas extensas com centenas de ativos e cruzar indicadores (como P/VP, Dividend Yield, Liquidez) manualmente.
+Segundo dados da B3, milhões de brasileiros já investem em ativos de renda variável, como ações e Fundos Imobiliários (FIIs). No entanto, apesar do crescimento no número de investidores, a jornada de seleção de ativos ainda é complexa, técnica e exaustiva.
 
-### Principais Dores
-- Falta de tempo: Dificuldade em acompanhar as flutuações diárias de preços para encontrar o momento ideal de compra.
-- Excesso de informação (Sobrecarga): Plataformas gratuitas entregam todos os dados de uma vez, sem filtros inteligentes, causando paralisia por análise.
-- Atraso na tomada de decisão: O investidor perde oportunidades ("pechinchas") por não ter um sistema de alertas em tempo real quando um bom ativo atinge o preço desejado.
+Atualmente, o investidor pessoa física precisa acessar múltiplos portais de dados financeiros, como o Fundamentus, extrair informações manualmente e lidar com planilhas extensas contendo centenas de ativos. Esse processo exige o cruzamento de diversos indicadores financeiros — como P/VP, Dividend Yield e Liquidez — o que demanda tempo, conhecimento técnico e organização.
+
+Além disso, a ausência de ferramentas acessíveis que consolidem e interpretem esses dados de forma automatizada faz com que muitos investidores tomem decisões baseadas em informações incompletas ou superficiais, aumentando o risco de escolhas inadequadas.
+
 
 ## Objetivos
-### Objetivo Geral
-Desenvolver uma plataforma web completa (Ponta a Ponta) que automatize a extração de dados do mercado financeiro, cruze indicadores de forma inteligente e conecte o investidor de varejo a oportunidades reais de investimento (focando inicialmente em Fundos Imobiliários), aumentando a assertividade e reduzindo o tempo de análise.
 
-### Objetivos Específicos
-- Desenvolver um Bot de RPA/Scraping autônomo para mapear e extrair indicadores diários de fontes públicas (Fundamentus).
-- Construir uma API RESTful (Django) estruturada para processar as regras de negócio e armazenar o histórico de cotações em um banco de dados relacional.
-- Criar um Dashboard Web (Frontend) intuitivo para o usuário visualizar as "Pechinchas" (ativos baratos e pagadores de bons dividendos).
-- Implementar um sistema de Alertas e Notificações para avisar o usuário quando um ativo alvo atingir o preço desejado.
-- Estabelecer uma camada de Observabilidade (Grafana/Prometheus) para monitorar a saúde do robô e a taxa de sucesso das extrações.
+Desenvolver uma plataforma web completa (end-to-end) capaz de automatizar a extração de dados públicos do mercado financeiro, realizar o cruzamento inteligente de indicadores fundamentalistas e apresentar, de forma estruturada e visual, oportunidades de investimento para o investidor de varejo.
+
+A solução terá como foco inicial os Fundos Imobiliários (FIIs), utilizando métricas como P/VP, Dividend Yield e Liquidez para gerar insights que aumentem a assertividade na tomada de decisão e reduzam significativamente o tempo necessário para análise manual.
 
 ## Justificativa
-A educação financeira e o acesso à informação de qualidade são fundamentais para a redução das desigualdades e para a construção de patrimônio a longo prazo. O mercado financeiro é dinâmico e exige ferramentas que acompanhem essa velocidade.
 
-Ao criar o FinancialInsight, o projeto não apenas resolve uma dor técnica de análise de dados, mas democratiza o acesso a metodologias de triagem que antes eram restritas a profissionais. O sistema faz o "trabalho pesado" (coleta e matemática), permitindo que o usuário foque apenas na tomada de decisão.
+A educação financeira e o acesso à informação de qualidade são fatores essenciais para a redução das desigualdades econômicas e para a construção de patrimônio no longo prazo. No Brasil, estudos da ANBIMA indicam que grande parte da população ainda apresenta baixo nível de conhecimento financeiro, o que impacta diretamente a qualidade das decisões de investimento.
 
-O impacto esperado é a facilitação do acesso a investimentos geradores de renda passiva (FIIs), entregando uma ferramenta robusta, escalável e de alto valor agregado para o usuário final. Além disso, o projeto consolida uma arquitetura de software moderna (Scraping, APIs, React e DevOps), servindo como um case de engenharia de software de alto nível.
+Paralelamente, o mercado financeiro é altamente dinâmico e orientado por dados, exigindo ferramentas capazes de acompanhar sua velocidade e complexidade. Nesse cenário, investidores que não possuem acesso a soluções analíticas acabam enfrentando desvantagens significativas na identificação de oportunidades.
+
+Diante disso, o desenvolvimento do FinancialInsight se justifica por atuar diretamente na redução dessa assimetria de informação. A plataforma não apenas resolve uma dor técnica relacionada à coleta e análise de dados, mas também democratiza o acesso a metodologias de triagem que, tradicionalmente, são restritas a investidores institucionais ou profissionais do mercado.
+
+Ao automatizar etapas críticas — como a coleta de dados e o cálculo de indicadores — o sistema assume o “trabalho pesado”, permitindo que o usuário concentre seus esforços na interpretação das informações e na tomada de decisão.
+
+O impacto esperado do projeto é a ampliação do acesso a investimentos geradores de renda passiva, especialmente por meio de Fundos Imobiliários (FIIs), além da entrega de uma solução robusta, escalável e orientada a dados para o usuário final.
 
 ## Público-Alvo
-O público-alvo da aplicação é composto por:
 
-- Investidores de Varejo (Iniciantes e Intermediários): Pessoas físicas que já possuem conta em corretora e buscam construir uma carteira de dividendos, mas não têm tempo ou conhecimento avançado para analisar centenas de balanços financeiros.
-- Usuários Analíticos: Investidores que desejam cadastrar preços-alvo e receber notificações automatizadas para otimizar seus aportes mensais.
-- Administrador do Sistema: Responsável pelo monitoramento da infraestrutura, manutenção dos seletores do web scraper e análise das métricas no Grafana.
+O público-alvo da aplicação é composto por três perfis principais:
+
+### Investidores de Varejo (Iniciantes e Intermediários)
+
+Pessoas físicas que já possuem conta em corretoras e desejam construir uma carteira de investimentos voltada à geração de renda passiva, especialmente por meio de dividendos. Esse grupo enfrenta limitações de tempo e conhecimento técnico para realizar análises aprofundadas de múltiplos ativos, tornando-se o principal beneficiário da automação proposta pela plataforma.
+
+---
+
+### Usuários Analíticos
+
+Investidores com perfil mais orientado a dados, que buscam maior controle sobre suas decisões de investimento. Esses usuários têm interesse em definir critérios personalizados — como preços-alvo e indicadores específicos — e receber alertas automatizados que auxiliem na otimização de seus aportes e estratégias.
+
+---
+
+### Administrador do Sistema
+
+Responsável pela operação e sustentação da plataforma, incluindo o monitoramento da infraestrutura, manutenção dos seletores utilizados no processo de web scraping e acompanhamento de métricas e logs por meio de ferramentas de observabilidade, como o Grafana.
+
+## Referências
+
+- B3. Informações institucionais e estatísticas do mercado. Disponível em: <https://www.b3.com.br>. Acesso em: 2026.  
+- ANBIMA. Raio X do Investidor Brasileiro. Disponível em: <https://www.anbima.com.br>. Acesso em: 2026.  
+- Bloomberg. Bloomberg Terminal Overview. Disponível em: <https://www.bloomberg.com>. Acesso em: 2026.  
