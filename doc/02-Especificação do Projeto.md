@@ -2,7 +2,7 @@
 
 ## Introdução
 
-Esta seção apresenta a especificação do projeto FinancialInsight sob a perspectiva das funcionalidades e comportamentos esperados do sistema, considerando as necessidades dos diferentes perfis de usuários envolvidos. O foco está na definição clara dos requisitos que permitirão a automatização da coleta, processamento e visualização de dados do mercado financeiro, especialmente no contexto de análise de Fundos Imobiliários (FIIs).
+Esta seção apresenta a especificação do projeto **FinancialInsight** sob a perspectiva das funcionalidades e comportamentos esperados do sistema, considerando as necessidades dos diferentes perfis de usuários envolvidos. O foco está na definição clara dos requisitos que permitirão a automatização da coleta, processamento e visualização de dados do mercado financeiro, especialmente no contexto de análise de Fundos Imobiliários (FIIs).
 
 Para isso, são utilizadas técnicas de análise e especificação de requisitos que possibilitam estruturar as funcionalidades do sistema de forma objetiva, traduzindo as necessidades dos usuários em comportamentos mensuráveis e implementáveis. O objetivo é garantir que a solução seja eficiente, escalável e alinhada à proposta de simplificar o processo de análise de investimentos.
 
@@ -10,9 +10,7 @@ Nesta seção são apresentados os requisitos funcionais e não funcionais, as r
 
 ## Personas
 
-## Personas
-
-### 👤 João Silva, 32 anos — Investidor de Varejo (Iniciante/Intermediário)
+### João Silva, 32 anos — Investidores de Varejo (Iniciantes e Intermediários)
 
 **Perfil:**  
 João é analista administrativo e começou a investir recentemente buscando complementar sua renda no longo prazo. Possui conta em corretora e já investe em alguns Fundos Imobiliários, mas ainda não domina análise fundamentalista.
@@ -37,7 +35,7 @@ Construir uma carteira de renda passiva consistente por meio de FIIs, com boas o
 
 ---
 
-### 📊 Mariana Costa, 28 anos — Usuária Analítica
+### Mariana Costa, 28 anos — Usuários Analíticos
 
 **Perfil:**  
 Mariana é desenvolvedora e investidora com perfil mais técnico. Já possui conhecimento em indicadores fundamentalistas e busca otimizar suas decisões com base em dados.
@@ -62,7 +60,7 @@ Maximizar seus aportes mensais com base em critérios próprios, identificando o
 
 ---
 
-### ⚙️ Carlos Mendes, 35 anos — Administrador do Sistema
+### Carlos Mendes, 35 anos — Administrador do Sistema
 
 **Perfil:**  
 Carlos é desenvolvedor responsável pela manutenção e evolução da plataforma. Atua no monitoramento da aplicação e na garantia da disponibilidade dos dados.
@@ -89,12 +87,12 @@ Assegurar o funcionamento contínuo do sistema, garantindo a confiabilidade dos 
 
 | Persona | Eu como... | Quero/Preciso... | Para... |
 |--------|-----------|------------------|--------|
-| João Silva (Investidor de Varejo) | Investidor iniciante/intermediário | Visualizar um ranking dos melhores FIIs com base em indicadores | Identificar rapidamente boas oportunidades de investimento |
-| João Silva (Investidor de Varejo) | Investidor iniciante/intermediário | Acessar dados organizados e simplificados | Reduzir a complexidade da análise financeira |
-| João Silva (Investidor de Varejo) | Investidor iniciante/intermediário | Evitar análise manual de múltiplos ativos | Economizar tempo na tomada de decisão |
-| Mariana Costa (Usuária Analítica) | Investidora orientada a dados | Definir filtros personalizados de análise | Aplicar sua própria estratégia de investimento |
-| Mariana Costa (Usuária Analítica) | Investidora orientada a dados | Cadastrar preços-alvo para ativos | Identificar pontos ideais de entrada |
-| Mariana Costa (Usuária Analítica) | Investidora orientada a dados | Receber alertas automáticos | Aproveitar oportunidades sem monitoramento constante |
-| Carlos Mendes (Administrador) | Administrador do sistema | Monitorar a execução dos processos de scraping | Garantir a confiabilidade dos dados |
-| Carlos Mendes (Administrador) | Administrador do sistema | Acompanhar métricas e logs da aplicação | Identificar falhas e manter a estabilidade do sistema |
-| Carlos Mendes (Administrador) | Administrador do sistema | Atualizar seletores de coleta de dados | Manter o funcionamento do sistema diante de mudanças externas |
+| João Silva | Investidores de Varejo (Iniciantes e Intermediários) | Visualizar um ranking dos melhores FIIs com base em indicadores | Identificar rapidamente boas oportunidades de investimento |
+| João Silva | Investidores de Varejo (Iniciantes e Intermediários) | Acessar dados organizados e simplificados | Reduzir a complexidade da análise financeira |
+| João Silva | Investidores de Varejo (Iniciantes e Intermediários) | Evitar análise manual de múltiplos ativos | Economizar tempo na tomada de decisão |
+| Mariana Costa | Usuários Analíticos | Definir filtros personalizados de análise | Aplicar sua própria estratégia de investimento |
+| Mariana Costa | Usuários Analíticos | Cadastrar preços-alvo para ativos | Identificar pontos ideais de entrada |
+| Mariana Costa | Usuários Analíticos | Receber alertas automáticos | Aproveitar oportunidades sem monitoramento constante |
+| Carlos Mendes | Administrador do Sistema | Monitorar a execução dos processos de scraping | Garantir a confiabilidade dos dados |
+| Carlos Mendes | Administrador do Sistema | Acompanhar métricas e logs da aplicação | Identificar falhas e manter a estabilidade do sistema |
+| Carlos Mendes | Administrador do Sistema | Atualizar seletores de coleta de dados | Manter o funcionamento do sistema diante de mudanças externas |
