@@ -107,7 +107,7 @@ def upsert_general_rows(
     rows: list[dict[str, Any]],
 ) -> dict[str, int]:
     if not rows:
-        return {"upserted": 0}
+        return {"upserted": 0, "posted": 0, "updated": 0}
 
     now_dt = datetime.now(timezone.utc)
     values = [
@@ -156,14 +156,17 @@ def upsert_general_rows(
             cap_rate = EXCLUDED.cap_rate,
             avg_vacancy = EXCLUDED.avg_vacancy,
             updated_at = NOW()
+        RETURNING (xmax = 0) AS posted
     """
 
     with _conn() as conn:
         with conn.cursor() as cur:
-            execute_values(cur, insert_sql, values, page_size=500)
+            upsert_rows = execute_values(cur, insert_sql, values, page_size=500, fetch=True)
         conn.commit()
 
-    return {"upserted": len(rows)}
+    posted = sum(1 for row in upsert_rows if row[0])
+    updated = len(upsert_rows) - posted
+    return {"upserted": len(rows), "posted": posted, "updated": updated}
 
 
 def _detail_tuple(
@@ -244,11 +247,11 @@ def upsert_detail_rows(
     rows: list[dict[str, Any]],
 ) -> dict[str, int]:
     if not rows:
-        return {"upserted": 0, "skipped": 0}
+        return {"upserted": 0, "posted": 0, "updated": 0, "skipped": 0}
 
     tickers = [row.get("ticker") for row in rows if row.get("ticker")]
     if not tickers:
-        return {"upserted": 0, "skipped": len(rows)}
+        return {"upserted": 0, "posted": 0, "updated": 0, "skipped": len(rows)}
 
     with _conn() as conn:
         with conn.cursor() as cur:
@@ -277,6 +280,7 @@ def upsert_detail_rows(
                     )
                 )
 
+            upsert_rows: list[tuple[bool]] = []
             if values:
                 insert_sql = f"""
                     INSERT INTO real_estate_fund_detail ({", ".join(DETAIL_COLUMNS)})
@@ -327,11 +331,14 @@ def upsert_detail_rows(
                         properties_avg_vacancy = EXCLUDED.properties_avg_vacancy,
                         properties_to_equity_percent = EXCLUDED.properties_to_equity_percent,
                         updated_at = NOW()
+                    RETURNING (xmax = 0) AS posted
                 """
-                execute_values(cur, insert_sql, values, page_size=500)
+                upsert_rows = execute_values(cur, insert_sql, values, page_size=500, fetch=True)
             else:
                 skipped = len(rows)
 
         conn.commit()
 
-    return {"upserted": len(values), "skipped": skipped}
+    posted = sum(1 for row in upsert_rows if row[0])
+    updated = len(upsert_rows) - posted
+    return {"upserted": len(values), "posted": posted, "updated": updated, "skipped": skipped}

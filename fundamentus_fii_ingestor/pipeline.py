@@ -4,6 +4,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timezone
+from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
@@ -72,6 +73,9 @@ async def run_ingestion(
     detail_tasks: list[asyncio.Task[dict[str, Any]]] = []
     semaphore = asyncio.Semaphore(detail_concurrency)
     raw_detail_rows: list[dict[str, Any]] = []
+    extraction_partial_seconds = 0.0
+    extraction_complete_seconds = 0.0
+    details_extraction_seconds = 0.0
 
     async with BrowserFactory(headless=headless, timeout_ms=DEFAULT_TIMEOUT_MS) as browser_factory:
         context = await browser_factory.start()
@@ -92,12 +96,15 @@ async def run_ingestion(
 
             detail_tasks.append(asyncio.create_task(run_detail_task()))
 
+        extraction_total_started = perf_counter()
+        partial_extraction_started = perf_counter()
         raw_rows = await extract_fii_table_raw(
             timeout_ms=DEFAULT_TIMEOUT_MS,
             page=general_page,
             limit=limit,
             on_row_extracted=on_row_extracted if should_collect_details else None,
         )
+        extraction_partial_seconds = perf_counter() - partial_extraction_started
         await general_page.close()
 
         if should_collect_details:
@@ -106,12 +113,32 @@ async def run_ingestion(
                 len(detail_tasks),
                 detail_concurrency,
             )
+            details_extraction_started = perf_counter()
             raw_detail_rows = await asyncio.gather(*detail_tasks) if detail_tasks else []
+            details_extraction_seconds = perf_counter() - details_extraction_started
+
+        extraction_complete_seconds = perf_counter() - extraction_total_started
 
     logger.info("Extracao bruta concluida. Total de linhas: %s", len(raw_rows))
+    logger.info(
+        "Tempo de extracao parcial (dados gerais): %.2fs",
+        extraction_partial_seconds,
+    )
+    logger.info("TEMPO TOTAL DE EXTRACAO (geral + detalhes): %.2fs", extraction_complete_seconds)
+    if should_collect_details:
+        logger.info("Tempo adicional de extracao de detalhes: %.2fs", details_extraction_seconds)
     if limit is not None and limit > 0:
         audit_event("limit_applied", {"run_id": run_id, "limit": limit, "rows_used": len(raw_rows)})
-    audit_event("raw_rows_collected", {"run_id": run_id, "total_rows": len(raw_rows)})
+    audit_event(
+        "raw_rows_collected",
+        {
+            "run_id": run_id,
+            "total_rows": len(raw_rows),
+            "extraction_partial_seconds": extraction_partial_seconds,
+            "extraction_complete_seconds": extraction_complete_seconds,
+            "details_extraction_seconds": details_extraction_seconds,
+        },
+    )
 
     collected_at = datetime.now(timezone.utc).isoformat()
     normalized_general_rows: list[dict[str, Any]] = []
@@ -149,6 +176,7 @@ async def run_ingestion(
             },
         )
 
+        general_db_started = perf_counter()
         db_general_result = upsert_general_rows(
             run_id=run_id,
             source=general_snapshot["source"],
@@ -156,8 +184,18 @@ async def run_ingestion(
             collected_at_utc=collected_at,
             rows=normalized_general_rows,
         )
-        logger.info("Persistencia geral no banco concluida: %s", db_general_result)
-        audit_event("general_db_upsert_finished", {"run_id": run_id, **db_general_result})
+        general_db_seconds = perf_counter() - general_db_started
+        logger.info(
+            "Persistencia geral no banco concluida em %.2fs (post=%s, update=%s, total=%s)",
+            general_db_seconds,
+            db_general_result.get("posted", 0),
+            db_general_result.get("updated", 0),
+            db_general_result.get("upserted", 0),
+        )
+        audit_event(
+            "general_db_upsert_finished",
+            {"run_id": run_id, "duration_seconds": general_db_seconds, **db_general_result},
+        )
 
     if should_collect_details:
         normalized_detail_rows = [normalize_fii_detail(item) for item in raw_detail_rows]
@@ -191,6 +229,7 @@ async def run_ingestion(
             },
         )
 
+        details_db_started = perf_counter()
         db_detail_result = upsert_detail_rows(
             run_id=run_id,
             source=details_snapshot["source"],
@@ -198,8 +237,19 @@ async def run_ingestion(
             collected_at_utc=collected_at,
             rows=normalized_detail_rows,
         )
-        logger.info("Persistencia de detalhes no banco concluida: %s", db_detail_result)
-        audit_event("details_db_upsert_finished", {"run_id": run_id, **db_detail_result})
+        details_db_seconds = perf_counter() - details_db_started
+        logger.info(
+            "Persistencia de detalhes no banco concluida em %.2fs (post=%s, update=%s, total=%s, skipped=%s)",
+            details_db_seconds,
+            db_detail_result.get("posted", 0),
+            db_detail_result.get("updated", 0),
+            db_detail_result.get("upserted", 0),
+            db_detail_result.get("skipped", 0),
+        )
+        audit_event(
+            "details_db_upsert_finished",
+            {"run_id": run_id, "duration_seconds": details_db_seconds, **db_detail_result},
+        )
 
     logger.info("Pipeline finalizada com sucesso.")
     audit_event("pipeline_finished", {"run_id": run_id, "status": "success"})
@@ -225,4 +275,7 @@ async def run_ingestion(
         "details_total": len(normalized_detail_rows),
         "general_snapshot_path": str(DEFAULT_GENERAL_SNAPSHOT_PATH) if should_collect_general else None,
         "details_snapshot_path": str(DEFAULT_DETAILS_SNAPSHOT_PATH) if should_collect_details else None,
+        "extraction_partial_seconds": extraction_partial_seconds,
+        "extraction_complete_seconds": extraction_complete_seconds,
+        "details_extraction_seconds": details_extraction_seconds,
     }
