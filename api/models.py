@@ -72,6 +72,7 @@ class RealEstateFundDetail(models.Model):
     market_share_count = models.DecimalField(max_digits=24, decimal_places=2, blank=True, null=True)
     market_report_date = models.CharField(max_length=32, blank=True, null=True)
     market_last_quarter_info_date = models.CharField(max_length=32, blank=True, null=True)
+    oscillations = models.JSONField(blank=True, null=True)
 
     # indicators
     indicators_ffo_yield = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)

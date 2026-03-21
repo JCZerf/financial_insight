@@ -5,7 +5,7 @@ from typing import Any
 
 import psycopg2
 from dotenv import load_dotenv
-from psycopg2.extras import execute_values
+from psycopg2.extras import Json, execute_values
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -54,6 +54,7 @@ DETAIL_COLUMNS = [
     "market_share_count",
     "market_report_date",
     "market_last_quarter_info_date",
+    "oscillations",
     "indicators_ffo_yield",
     "indicators_ffo_per_share",
     "indicators_dividend_yield",
@@ -177,6 +178,7 @@ def _detail_tuple(
     identification = row.get("identification", {}) or {}
     market = row.get("market", {}) or {}
     indicators = row.get("indicators", {}) or {}
+    oscillations = row.get("oscillations")
     results = row.get("results", {}) or {}
     balance_sheet = row.get("balance_sheet", {}) or {}
     properties = row.get("properties", {}) or {}
@@ -203,6 +205,7 @@ def _detail_tuple(
         market.get("share_count"),
         market.get("report_date"),
         market.get("last_quarter_info_date"),
+        Json(oscillations) if oscillations is not None else None,
         indicators.get("ffo_yield"),
         indicators.get("ffo_per_share"),
         indicators.get("dividend_yield"),
@@ -298,6 +301,7 @@ def upsert_detail_rows(
                         market_share_count = EXCLUDED.market_share_count,
                         market_report_date = EXCLUDED.market_report_date,
                         market_last_quarter_info_date = EXCLUDED.market_last_quarter_info_date,
+                        oscillations = EXCLUDED.oscillations,
                         indicators_ffo_yield = EXCLUDED.indicators_ffo_yield,
                         indicators_ffo_per_share = EXCLUDED.indicators_ffo_per_share,
                         indicators_dividend_yield = EXCLUDED.indicators_dividend_yield,

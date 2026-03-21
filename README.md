@@ -19,12 +19,12 @@ Plataforma para coleta, normalização e persistência de dados de Fundos Imobil
   - `RealEstateFundDetail` (dados detalhados)
 
 ## Estrutura Principal
-- `bot/main.py`: entrada CLI do bot.
-- `bot/data_ingestor.py`: orquestração do pipeline.
-- `bot/fundamentus_extractor.py`: extração da tabela geral.
-- `bot/fundamentus_details_extractor.py`: extração de detalhes.
-- `bot/normalizers.py`: normalização de payload.
-- `bot/db_persistence.py`: upsert em lote no PostgreSQL.
+- `fundamentus_fii_ingestor/main.py`: entrada CLI do bot.
+- `fundamentus_fii_ingestor/data_ingestor.py`: orquestração do pipeline.
+- `fundamentus_fii_ingestor/fundamentus_extractor.py`: extração da tabela geral.
+- `fundamentus_fii_ingestor/fundamentus_details_extractor.py`: extração de detalhes.
+- `fundamentus_fii_ingestor/normalizers.py`: normalização de payload.
+- `fundamentus_fii_ingestor/db_persistence.py`: upsert em lote no PostgreSQL.
 - `api/models.py`: modelos Django.
 - `doc/`: documentação funcional e de planejamento.
 
@@ -53,22 +53,22 @@ python manage.py migrate
 ## Executando O Bot
 Execução completa (geral + detalhes):
 ```bash
-python3 bot/main.py --detailed true --headless true
+python3 fundamentus_fii_ingestor/main.py --detailed true --headless true
 ```
 
 Teste com limite e concorrência reduzida:
 ```bash
-python3 bot/main.py --detailed true --limit 10 --concurrency 2 --headless true
+python3 fundamentus_fii_ingestor/main.py --detailed true --limit 10 --concurrency 2 --headless true
 ```
 
 Somente geral:
 ```bash
-python3 bot/main.py --detailed false --headless true
+python3 fundamentus_fii_ingestor/main.py --detailed false --headless true
 ```
 
 Somente detalhes:
 ```bash
-python3 bot/main.py --details-only --headless true
+python3 fundamentus_fii_ingestor/main.py --details-only --headless true
 ```
 
 ## Saídas

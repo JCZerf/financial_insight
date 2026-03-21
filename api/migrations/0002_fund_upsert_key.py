@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RemoveConstraint(
             model_name="realestatefund",
-            name="uq_real_estate_fund_run_id_papel",
+            name="uq_real_estate_fund_run_id_ticker",
         ),
         migrations.AlterField(
             model_name="realestatefund",
-            name="papel",
+            name="ticker",
             field=models.CharField(db_index=True, max_length=20, unique=True),
         ),
     ]

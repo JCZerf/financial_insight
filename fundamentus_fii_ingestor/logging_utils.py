@@ -29,7 +29,7 @@ def setup_logging(log_dir: Path, level: int = logging.INFO) -> None:
         )
         root_logger.addHandler(file_handler)
 
-    audit_logger = logging.getLogger("bot.audit")
+    audit_logger = logging.getLogger("fundamentus_fii_ingestor.audit")
     audit_logger.setLevel(logging.INFO)
     audit_logger.propagate = False
 
@@ -41,6 +41,6 @@ def setup_logging(log_dir: Path, level: int = logging.INFO) -> None:
 
 
 def audit_event(event: str, payload: dict[str, Any]) -> None:
-    audit_logger = logging.getLogger("bot.audit")
+    audit_logger = logging.getLogger("fundamentus_fii_ingestor.audit")
     body = {"event": event, **payload}
     audit_logger.info(json.dumps(body, ensure_ascii=False))

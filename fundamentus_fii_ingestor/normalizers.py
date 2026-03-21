@@ -55,6 +55,24 @@ def _first(values: list[str] | None, idx: int = 0) -> str:
     return _clean_text(values[idx])
 
 
+def _parse_oscillations(labels: dict[str, list[str]]) -> dict[str, Any]:
+    yearly: dict[str, float | None] = {}
+    for label, values in labels.items():
+        clean_label = _clean_text(label)
+        if len(clean_label) == 4 and clean_label.isdigit():
+            yearly[clean_label] = parse_br_percent(_first(values))
+
+    latest_year = max(yearly.keys(), default=None)
+    return {
+        "day": parse_br_percent(_first(labels.get("Dia"))),
+        "month": parse_br_percent(_first(labels.get("Mês"))),
+        "days_30": parse_br_percent(_first(labels.get("30 dias"))),
+        "months_12": parse_br_percent(_first(labels.get("12 meses"))),
+        "year_to_date": yearly.get(latest_year) if latest_year else None,
+        "yearly": yearly,
+    }
+
+
 def normalize_fii_detail(raw_detail: dict[str, Any]) -> dict[str, Any]:
     labels: dict[str, list[str]] = raw_detail.get("raw_labels", {}) or {}
 
@@ -79,6 +97,7 @@ def normalize_fii_detail(raw_detail: dict[str, Any]) -> dict[str, Any]:
             "report_date": _first(labels.get("Relatório")),
             "last_quarter_info_date": _first(labels.get("Últ Info Trimestral")),
         },
+        "oscillations": _parse_oscillations(labels),
         "indicators": {
             "ffo_yield": parse_br_percent(_first(labels.get("FFO Yield"))),
             "ffo_per_share": parse_br_number(_first(labels.get("FFO/Cota"))),
