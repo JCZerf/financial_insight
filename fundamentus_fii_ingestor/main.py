@@ -2,9 +2,11 @@ import argparse
 import asyncio
 
 try:
-    from bot.data_ingestor import run_ingestion
+    from fundamentus_fii_ingestor.config import DEFAULT_MAX_DETAIL_TABS, env_int
+    from fundamentus_fii_ingestor.pipeline import run_ingestion
 except ModuleNotFoundError:
-    from data_ingestor import run_ingestion
+    from config import DEFAULT_MAX_DETAIL_TABS, env_int
+    from pipeline import run_ingestion
 
 
 def str_to_bool(value: str) -> bool:
@@ -17,6 +19,7 @@ def str_to_bool(value: str) -> bool:
 
 
 def parse_args() -> argparse.Namespace:
+    default_concurrency = env_int("BOT_MAX_DETAIL_TABS", DEFAULT_MAX_DETAIL_TABS)
     parser = argparse.ArgumentParser(
         description="Financial Insight FII ingestor runner",
     )
@@ -40,8 +43,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=8,
-        help="Parallel detail workers. Default: 8",
+        default=default_concurrency,
+        help=f"Parallel detail workers / max open detail tabs. Default: BOT_MAX_DETAIL_TABS or {default_concurrency}",
     )
     parser.add_argument(
         "--limit",

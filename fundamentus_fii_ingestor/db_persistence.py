@@ -5,7 +5,7 @@ from typing import Any
 
 import psycopg2
 from dotenv import load_dotenv
-from psycopg2.extras import execute_values
+from psycopg2.extras import Json, execute_values
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -54,6 +54,7 @@ DETAIL_COLUMNS = [
     "market_share_count",
     "market_report_date",
     "market_last_quarter_info_date",
+    "oscillations",
     "indicators_ffo_yield",
     "indicators_ffo_per_share",
     "indicators_dividend_yield",
@@ -106,7 +107,7 @@ def upsert_general_rows(
     rows: list[dict[str, Any]],
 ) -> dict[str, int]:
     if not rows:
-        return {"upserted": 0}
+        return {"upserted": 0, "posted": 0, "updated": 0}
 
     now_dt = datetime.now(timezone.utc)
     values = [
@@ -155,14 +156,17 @@ def upsert_general_rows(
             cap_rate = EXCLUDED.cap_rate,
             avg_vacancy = EXCLUDED.avg_vacancy,
             updated_at = NOW()
+        RETURNING (xmax = 0) AS posted
     """
 
     with _conn() as conn:
         with conn.cursor() as cur:
-            execute_values(cur, insert_sql, values, page_size=500)
+            upsert_rows = execute_values(cur, insert_sql, values, page_size=500, fetch=True)
         conn.commit()
 
-    return {"upserted": len(rows)}
+    posted = sum(1 for row in upsert_rows if row[0])
+    updated = len(upsert_rows) - posted
+    return {"upserted": len(rows), "posted": posted, "updated": updated}
 
 
 def _detail_tuple(
@@ -177,6 +181,7 @@ def _detail_tuple(
     identification = row.get("identification", {}) or {}
     market = row.get("market", {}) or {}
     indicators = row.get("indicators", {}) or {}
+    oscillations = row.get("oscillations")
     results = row.get("results", {}) or {}
     balance_sheet = row.get("balance_sheet", {}) or {}
     properties = row.get("properties", {}) or {}
@@ -203,6 +208,7 @@ def _detail_tuple(
         market.get("share_count"),
         market.get("report_date"),
         market.get("last_quarter_info_date"),
+        Json(oscillations) if oscillations is not None else None,
         indicators.get("ffo_yield"),
         indicators.get("ffo_per_share"),
         indicators.get("dividend_yield"),
@@ -241,11 +247,11 @@ def upsert_detail_rows(
     rows: list[dict[str, Any]],
 ) -> dict[str, int]:
     if not rows:
-        return {"upserted": 0, "skipped": 0}
+        return {"upserted": 0, "posted": 0, "updated": 0, "skipped": 0}
 
     tickers = [row.get("ticker") for row in rows if row.get("ticker")]
     if not tickers:
-        return {"upserted": 0, "skipped": len(rows)}
+        return {"upserted": 0, "posted": 0, "updated": 0, "skipped": len(rows)}
 
     with _conn() as conn:
         with conn.cursor() as cur:
@@ -274,6 +280,7 @@ def upsert_detail_rows(
                     )
                 )
 
+            upsert_rows: list[tuple[bool]] = []
             if values:
                 insert_sql = f"""
                     INSERT INTO real_estate_fund_detail ({", ".join(DETAIL_COLUMNS)})
@@ -298,6 +305,7 @@ def upsert_detail_rows(
                         market_share_count = EXCLUDED.market_share_count,
                         market_report_date = EXCLUDED.market_report_date,
                         market_last_quarter_info_date = EXCLUDED.market_last_quarter_info_date,
+                        oscillations = EXCLUDED.oscillations,
                         indicators_ffo_yield = EXCLUDED.indicators_ffo_yield,
                         indicators_ffo_per_share = EXCLUDED.indicators_ffo_per_share,
                         indicators_dividend_yield = EXCLUDED.indicators_dividend_yield,
@@ -323,11 +331,14 @@ def upsert_detail_rows(
                         properties_avg_vacancy = EXCLUDED.properties_avg_vacancy,
                         properties_to_equity_percent = EXCLUDED.properties_to_equity_percent,
                         updated_at = NOW()
+                    RETURNING (xmax = 0) AS posted
                 """
-                execute_values(cur, insert_sql, values, page_size=500)
+                upsert_rows = execute_values(cur, insert_sql, values, page_size=500, fetch=True)
             else:
                 skipped = len(rows)
 
         conn.commit()
 
-    return {"upserted": len(values), "skipped": skipped}
+    posted = sum(1 for row in upsert_rows if row[0])
+    updated = len(upsert_rows) - posted
+    return {"upserted": len(values), "posted": posted, "updated": updated, "skipped": skipped}

@@ -3,15 +3,16 @@ import logging
 import time
 from typing import Any
 
-from playwright.async_api import Page, async_playwright
+from playwright.async_api import Page
 
 try:
-    from bot.logging_utils import audit_event
+    from fundamentus_fii_ingestor.logging_utils import audit_event
 except ModuleNotFoundError:
     from logging_utils import audit_event
 
 logger = logging.getLogger(__name__)
 FUNDAMENTUS_BASE_URL = "https://www.fundamentus.com.br/"
+DETAIL_PAGE_REFERER = "https://www.fundamentus.com.br/fii_resultado.php"
 
 
 def _build_detail_url(item: dict[str, Any]) -> str:
@@ -84,7 +85,12 @@ async def _extract_one_detail(
 
     page = await context.new_page()
     try:
-        await page.goto(detail_url, wait_until="domcontentloaded", timeout=timeout_ms)
+        await page.goto(
+            detail_url,
+            wait_until="domcontentloaded",
+            timeout=timeout_ms,
+            referer=DETAIL_PAGE_REFERER,
+        )
         await page.wait_for_selector(".conteudo table.w728", timeout=timeout_ms)
         labels = await _extract_label_values(page)
 
@@ -132,6 +138,48 @@ async def _extract_one_detail(
         await page.close()
 
 
+async def extract_one_detail(
+    context: Any,
+    item: dict[str, Any],
+    idx: int,
+    timeout_ms: int = 30_000,
+) -> dict[str, Any]:
+    """Extrai um único detalhe reutilizando um context já aberto."""
+    return await _extract_one_detail(context, item, idx, timeout_ms)
+
+
+async def extract_fii_details_from_context_in_parallel(
+    context: Any,
+    items: list[dict[str, Any]],
+    timeout_ms: int = 30_000,
+    concurrency: int = 8,
+) -> list[dict[str, Any]]:
+    """Extrai detalhes em paralelo reaproveitando o mesmo browser context."""
+    logger.info(
+        "Iniciando extracao de detalhes em paralelo (contexto compartilhado). Total: %s | concorrencia: %s",
+        len(items),
+        concurrency,
+    )
+    semaphore = asyncio.Semaphore(concurrency)
+
+    async def run_guarded(item: dict[str, Any], idx: int) -> dict[str, Any]:
+        async with semaphore:
+            return await _extract_one_detail(context, item, idx, timeout_ms)
+
+    tasks = [run_guarded(item, idx) for idx, item in enumerate(items)]
+    results = await asyncio.gather(*tasks)
+    logger.info("Extracao de detalhes finalizada. Total processado: %s", len(results))
+    audit_event(
+        "detail_batch_finished",
+        {
+            "total": len(results),
+            "success": sum(1 for item in results if item.get("collection_status") == "success"),
+            "error": sum(1 for item in results if item.get("collection_status") == "error"),
+        },
+    )
+    return results
+
+
 async def extract_fii_details_in_parallel(
     items: list[dict[str, Any]],
     headless: bool = True,
@@ -143,33 +191,16 @@ async def extract_fii_details_in_parallel(
         len(items),
         concurrency,
     )
+    try:
+        from fundamentus_fii_ingestor.browser_factory import BrowserFactory
+    except ModuleNotFoundError:
+        from browser_factory import BrowserFactory
 
-    semaphore = asyncio.Semaphore(concurrency)
-
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=headless)
-        context = await browser.new_context(
-            locale="pt-BR",
-            timezone_id="America/Sao_Paulo",
+    async with BrowserFactory(headless=headless, timeout_ms=timeout_ms) as browser_factory:
+        context = await browser_factory.start()
+        return await extract_fii_details_from_context_in_parallel(
+            context=context,
+            items=items,
+            timeout_ms=timeout_ms,
+            concurrency=concurrency,
         )
-
-        async def run_guarded(item: dict[str, Any], idx: int) -> dict[str, Any]:
-            async with semaphore:
-                return await _extract_one_detail(context, item, idx, timeout_ms)
-
-        tasks = [run_guarded(item, idx) for idx, item in enumerate(items)]
-        results = await asyncio.gather(*tasks)
-
-        await context.close()
-        await browser.close()
-
-    logger.info("Extracao de detalhes finalizada. Total processado: %s", len(results))
-    audit_event(
-        "detail_batch_finished",
-        {
-            "total": len(results),
-            "success": sum(1 for item in results if item.get("collection_status") == "success"),
-            "error": sum(1 for item in results if item.get("collection_status") == "error"),
-        },
-    )
-    return results
