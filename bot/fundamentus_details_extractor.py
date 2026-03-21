@@ -15,12 +15,12 @@ FUNDAMENTUS_BASE_URL = "https://www.fundamentus.com.br/"
 
 
 def _build_detail_url(item: dict[str, Any]) -> str:
-    explicit_url = item.get("detalhe_url")
+    explicit_url = item.get("detail_url") or item.get("detalhe_url")
     if isinstance(explicit_url, str) and explicit_url.strip():
         return explicit_url
 
-    papel = str(item.get("Papel", "")).strip() or str(item.get("papel", "")).strip()
-    return f"{FUNDAMENTUS_BASE_URL}detalhes.php?papel={papel}"
+    ticker = str(item.get("Papel", "")).strip() or str(item.get("ticker", "")).strip()
+    return f"{FUNDAMENTUS_BASE_URL}detalhes.php?papel={ticker}"
 
 
 async def _extract_label_values(page: Page) -> dict[str, list[str]]:
@@ -72,14 +72,14 @@ async def _extract_one_detail(
     idx: int,
     timeout_ms: int,
 ) -> dict[str, Any]:
-    papel = str(item.get("Papel", "")).strip() or str(item.get("papel", "")).strip()
+    ticker = str(item.get("Papel", "")).strip() or str(item.get("ticker", "")).strip()
     detail_url = _build_detail_url(item)
     started = time.perf_counter()
 
-    logger.info("Abrindo nova aba para detalhe: %s (%s)", papel, detail_url)
+    logger.info("Abrindo nova aba para detalhe: %s (%s)", ticker, detail_url)
     audit_event(
         "detail_extraction_started",
-        {"row_index": idx, "papel": papel, "url": detail_url},
+        {"row_index": idx, "ticker": ticker, "url": detail_url},
     )
 
     page = await context.new_page()
@@ -89,12 +89,12 @@ async def _extract_one_detail(
         labels = await _extract_label_values(page)
 
         elapsed_ms = int((time.perf_counter() - started) * 1000)
-        logger.info("Detalhe extraido: %s em %sms", papel, elapsed_ms)
+        logger.info("Detalhe extraido: %s em %sms", ticker, elapsed_ms)
         audit_event(
             "detail_extraction_finished",
             {
                 "row_index": idx,
-                "papel": papel,
+                "ticker": ticker,
                 "url": detail_url,
                 "duration_ms": elapsed_ms,
                 "labels_found": len(labels),
@@ -102,19 +102,19 @@ async def _extract_one_detail(
             },
         )
         return {
-            "papel": papel,
-            "detalhe_url": detail_url,
+            "ticker": ticker,
+            "detail_url": detail_url,
             "raw_labels": labels,
-            "status_coleta": "success",
+            "collection_status": "success",
         }
     except Exception as exc:
         elapsed_ms = int((time.perf_counter() - started) * 1000)
-        logger.exception("Falha ao extrair detalhe de %s", papel)
+        logger.exception("Falha ao extrair detalhe de %s", ticker)
         audit_event(
             "detail_extraction_finished",
             {
                 "row_index": idx,
-                "papel": papel,
+                "ticker": ticker,
                 "url": detail_url,
                 "duration_ms": elapsed_ms,
                 "status": "error",
@@ -122,11 +122,11 @@ async def _extract_one_detail(
             },
         )
         return {
-            "papel": papel,
-            "detalhe_url": detail_url,
+            "ticker": ticker,
+            "detail_url": detail_url,
             "raw_labels": {},
-            "status_coleta": "error",
-            "erro": str(exc),
+            "collection_status": "error",
+            "error": str(exc),
         }
     finally:
         await page.close()
@@ -168,8 +168,8 @@ async def extract_fii_details_in_parallel(
         "detail_batch_finished",
         {
             "total": len(results),
-            "success": sum(1 for item in results if item.get("status_coleta") == "success"),
-            "error": sum(1 for item in results if item.get("status_coleta") == "error"),
+            "success": sum(1 for item in results if item.get("collection_status") == "success"),
+            "error": sum(1 for item in results if item.get("collection_status") == "error"),
         },
     )
     return results

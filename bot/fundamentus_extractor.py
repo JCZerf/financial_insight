@@ -71,13 +71,13 @@ async def _extract_rows(page: Any, headers: list[str]) -> list[dict[str, str]]:
             for idx, header in enumerate(headers)
         }
         if href:
-            row_data["detalhe_url"] = f"{FUNDAMENTUS_BASE_URL}{href.lstrip('/')}"
+            row_data["detail_url"] = f"{FUNDAMENTUS_BASE_URL}{href.lstrip('/')}"
         results.append(row_data)
         audit_event(
             "raw_row_extracted",
             {
                 "row_index": i,
-                "papel": row_data.get("Papel", ""),
+                "ticker": row_data.get("Papel", ""),
                 "row": row_data,
             },
         )

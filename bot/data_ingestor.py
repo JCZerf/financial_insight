@@ -91,7 +91,7 @@ async def run_ingestion(
                 {
                     "run_id": run_id,
                     "row_index": idx,
-                    "papel": row.get("papel", ""),
+                    "ticker": row.get("ticker", ""),
                     "row": row,
                 },
             )
@@ -149,8 +149,8 @@ async def run_ingestion(
                 {
                     "run_id": run_id,
                     "row_index": idx,
-                    "papel": row.get("papel", ""),
-                    "status_coleta": row.get("status_coleta", ""),
+                    "ticker": row.get("ticker", ""),
+                    "collection_status": row.get("collection_status", ""),
                 },
             )
 
