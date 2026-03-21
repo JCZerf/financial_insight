@@ -75,3 +75,39 @@
   - `year_to_date` (ano mais recente disponível)
   - `yearly` (mapa por ano, ex.: `{\"2026\": -5.06, ...}`)
 - Persistência atualizada no upsert de detalhes (`db_persistence`).
+
+### 13) Observabilidade de tempo de ponta a ponta da extração
+- O pipeline passou a registrar tempos com foco operacional:
+  - `Tempo de extracao parcial (dados gerais)`
+  - `TEMPO TOTAL DE EXTRACAO (geral + detalhes)` (métrica principal)
+  - `Tempo adicional de extracao de detalhes`
+- A métrica de extração total foi ajustada para tempo real de relógio (início da coleta até término dos detalhes), evitando soma artificial de blocos.
+- Os tempos também são enviados para auditoria em `raw_rows_collected`.
+
+### 14) Métricas de persistência por tipo de operação (post/update)
+- O upsert em `db_persistence` passou a retornar:
+  - gerais: `upserted`, `posted`, `updated`
+  - detalhes: `upserted`, `posted`, `updated`, `skipped`
+- Implementação usa `RETURNING (xmax = 0) AS posted` para distinguir insert de update em lote.
+- O pipeline agora loga duração e breakdown na persistência:
+  - geral: tempo + `post/update/total`
+  - detalhes: tempo + `post/update/total/skipped`
+
+### 15) Ambiente de teste limitado via Docker (512MB / 1 CPU)
+- Foi criado `Dockerfile.ingestor` para execução do bot em container dedicado.
+- `docker-compose.yml` recebeu serviço `ingestor` com:
+  - `mem_limit: 512m`
+  - `cpus: 1.0`
+- A base Playwright foi alinhada para `mcr.microsoft.com/playwright/python:v1.58.0-jammy` para compatibilidade com pacote Python instalado.
+- A chave `version` foi removida do compose para eliminar warning de obsolescência.
+
+### 16) Profiling de recursos para diagnosticar causa de falha
+- Foi criado `scripts/profile_ingestor_resources.sh` para evitar diagnóstico por tentativa/erro.
+- O script executa o ingestor, coleta `docker stats` por segundo e resume:
+  - pico de CPU
+  - pico de memória
+  - `ExitCode`
+  - `OOMKilled`
+- Resultado observado nos testes:
+  - `concurrency=2` em 512MB/1CPU opera no limite (CPU saturada e RAM muito próxima do teto).
+  - `concurrency=1` aumenta estabilidade e completou o cenário de teste, mantendo CPU como gargalo principal.
