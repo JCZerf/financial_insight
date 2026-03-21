@@ -1,45 +1,86 @@
 # FinancialInsight
 
-Plataforma para coleta, organização e visualização de dados do mercado financeiro, com foco inicial na análise de Fundos Imobiliários (FIIs) para apoiar decisões de investimento orientadas por dados.
+Plataforma para coleta, normalização e persistência de dados de Fundos Imobiliários (FIIs), com foco em extração automatizada do Fundamentus.
 
-## Visão Geral
-- Coleta automatizada de dados públicos de fontes financeiras.
-- Processamento, normalização e armazenamento de indicadores.
-- API backend para expor dados e regras de negócio.
-- Dashboard para visualização, análise e monitoramento de oportunidades.
-- Estrutura pensada para apoiar filtros, ranking de ativos e alertas.
+## Stack
+- Python
+- Django
+- PostgreSQL
+- Playwright
 
-## Escopo Inicial
-- Análise de FIIs com base em indicadores como P/VP, Dividend Yield e Liquidez.
-- Identificação de oportunidades por meio de ranking e filtros.
-- Monitoramento de ativos com condições definidas pelo usuário.
-- Geração de alertas para apoiar o acompanhamento do mercado.
+## O Que Já Está Implementado
+- Coleta da tabela geral de FIIs (`fii_resultado.php`).
+- Coleta de detalhes por ativo (`detalhes.php?papel=...`) com concorrência controlada.
+- Normalização de dados (números BR, percentuais e campos nulos).
+- Logging operacional e auditoria de extração (`data/logs`).
+- Persistência em PostgreSQL com upsert (atualiza registros existentes por `papel`).
+- Modelagem inicial com:
+  - `RealEstateFund` (dados gerais)
+  - `RealEstateFundDetail` (dados detalhados)
 
-## Estado Atual
-- Documentação de contexto e especificação já estruturadas.
-- Projeto Django inicializado.
-- Aplicação `api` criada para evolução do backend.
-- Stack técnica definida com Python, Django, PostgreSQL e Playwright.
-- Scraping, dashboard e observabilidade ainda em evolução.
+## Estrutura Principal
+- `bot/main.py`: entrada CLI do bot.
+- `bot/data_ingestor.py`: orquestração do pipeline.
+- `bot/fundamentus_extractor.py`: extração da tabela geral.
+- `bot/fundamentus_details_extractor.py`: extração de detalhes.
+- `bot/normalizers.py`: normalização de payload.
+- `bot/db_persistence.py`: upsert em lote no PostgreSQL.
+- `api/models.py`: modelos Django.
+- `doc/`: documentação funcional e de planejamento.
 
-## Stack Atual e Planejada
-- Linguagem base: Python.
-- Backend/API: Django.
-- Banco de dados: PostgreSQL.
-- Automação/Scraping: Playwright.
-- Frontend/Dashboard: planejado.
-- Observabilidade: planejada.
+## Configuração Local
+1. Instale dependências:
+```bash
+pip install -r requirements.txt
+playwright install chromium
+```
 
-## Estrutura do Repositório
-- `financial_insight/`: configuração principal do projeto Django.
-- `api/`: aplicação backend para modelos, views e evolução da API.
-- `doc/`: documentação do projeto.
-- `manage.py`: ponto de entrada para comandos do Django.
+2. Configure ambiente:
+```bash
+cp .env.example .env
+```
+
+3. Suba PostgreSQL local com Docker:
+```bash
+docker compose up -d
+```
+
+4. Rode migrações:
+```bash
+python manage.py migrate
+```
+
+## Executando O Bot
+Execução completa (geral + detalhes):
+```bash
+python3 bot/main.py --detailed true --headless true
+```
+
+Teste com limite e concorrência reduzida:
+```bash
+python3 bot/main.py --detailed true --limit 10 --concurrency 2 --headless true
+```
+
+Somente geral:
+```bash
+python3 bot/main.py --detailed false --headless true
+```
+
+Somente detalhes:
+```bash
+python3 bot/main.py --details-only --headless true
+```
+
+## Saídas
+- Snapshots:
+  - `data/fii_general_snapshot.json`
+  - `data/fii_details_snapshot.json`
+- Logs:
+  - `data/logs/ingestor.log`
+  - `data/logs/extraction_audit.ndjson`
 
 ## Documentação
-- Contexto do projeto: `doc/01-Documentação de Contexto.md`.
-- Especificação do projeto: `doc/02-Especificação do Projeto.md`.
-- Metodologia: `doc/03-Metodologia.md`.
-
-## Status
-Projeto em fase inicial de estruturação, com documentação já consolidando escopo, requisitos e visão do produto para guiar o desenvolvimento incremental.
+- Controle de coleta: `doc/00-Controle-Coleta-FIIs.md`
+- Contexto: `doc/01-Documentação de Contexto.md`
+- Especificação: `doc/02-Especificação do Projeto.md`
+- Metodologia: `doc/03-Metodologia.md` (pendente de preenchimento)

@@ -1,1 +1,9 @@
 /venv
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Bot artifacts
+data/logs/
+data/*.json
