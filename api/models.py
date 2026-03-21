@@ -10,7 +10,7 @@ class RealEstateFund(models.Model):
     url = models.URLField(max_length=500)
     collected_at_utc = models.DateTimeField(db_index=True)
 
-    papel = models.CharField(max_length=20, db_index=True)
+    papel = models.CharField(max_length=20, db_index=True, unique=True)
     segmento = models.CharField(max_length=120, blank=True, null=True)
 
     cotacao = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
@@ -21,7 +21,7 @@ class RealEstateFund(models.Model):
     valor_mercado = models.DecimalField(max_digits=24, decimal_places=2, blank=True, null=True)
     liquidez = models.DecimalField(max_digits=24, decimal_places=2, blank=True, null=True)
 
-    qtd_imoveis = models.IntegerField(blank=True, null=True)
+    qtd_imoveis = models.PositiveIntegerField(blank=True, null=True)
     preco_m2 = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     aluguel_m2 = models.DecimalField(max_digits=20, decimal_places=4, blank=True, null=True)
     cap_rate = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
@@ -32,12 +32,6 @@ class RealEstateFund(models.Model):
 
     class Meta:
         db_table = "real_estate_fund"
-        constraints = [
-            models.UniqueConstraint(
-                fields=["run_id", "papel"],
-                name="uq_real_estate_fund_run_id_papel",
-            )
-        ]
         indexes = [
             models.Index(fields=["papel", "collected_at_utc"], name="idx_ref_papel_collected"),
         ]
@@ -102,8 +96,8 @@ class RealEstateFundDetail(models.Model):
     balanco_patrimonio_liquido = models.DecimalField(max_digits=24, decimal_places=2, blank=True, null=True)
 
     # imoveis
-    imoveis_qtd_imoveis = models.IntegerField(blank=True, null=True)
-    imoveis_qtd_unidades = models.IntegerField(blank=True, null=True)
+    imoveis_qtd_imoveis = models.PositiveIntegerField(blank=True, null=True)
+    imoveis_qtd_unidades = models.PositiveIntegerField(blank=True, null=True)
     imoveis_area_m2 = models.DecimalField(max_digits=24, decimal_places=4, blank=True, null=True)
     imoveis_preco_m2 = models.DecimalField(max_digits=24, decimal_places=4, blank=True, null=True)
     imoveis_aluguel_m2 = models.DecimalField(max_digits=24, decimal_places=4, blank=True, null=True)

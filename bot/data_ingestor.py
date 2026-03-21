@@ -7,11 +7,13 @@ from typing import Any
 from uuid import uuid4
 
 try:
+    from bot.db_persistence import upsert_detail_rows, upsert_general_rows
     from bot.fundamentus_details_extractor import extract_fii_details_in_parallel
     from bot.fundamentus_extractor import extract_fii_table_raw
     from bot.logging_utils import audit_event, setup_logging
     from bot.normalizers import normalize_fii_detail, normalize_fii_row
 except ModuleNotFoundError:
+    from db_persistence import upsert_detail_rows, upsert_general_rows
     from fundamentus_details_extractor import extract_fii_details_in_parallel
     from fundamentus_extractor import extract_fii_table_raw
     from logging_utils import audit_event, setup_logging
@@ -113,6 +115,21 @@ async def run_ingestion(
                 "collected_at_utc": collected_at,
             },
         )
+        db_general_result = upsert_general_rows(
+            run_id=run_id,
+            source=general_snapshot["source"],
+            url=general_snapshot["url"],
+            collected_at_utc=collected_at,
+            rows=normalized_general_rows,
+        )
+        logger.info("Persistencia geral no banco concluida: %s", db_general_result)
+        audit_event(
+            "general_db_upsert_finished",
+            {
+                "run_id": run_id,
+                **db_general_result,
+            },
+        )
 
     if should_collect_details:
         raw_detail_rows = await extract_fii_details_in_parallel(
@@ -154,6 +171,21 @@ async def run_ingestion(
                 "path": str(DEFAULT_DETAILS_SNAPSHOT_PATH),
                 "total": len(normalized_detail_rows),
                 "collected_at_utc": collected_at,
+            },
+        )
+        db_detail_result = upsert_detail_rows(
+            run_id=run_id,
+            source=details_snapshot["source"],
+            url=details_snapshot["url"],
+            collected_at_utc=collected_at,
+            rows=normalized_detail_rows,
+        )
+        logger.info("Persistencia de detalhes no banco concluida: %s", db_detail_result)
+        audit_event(
+            "details_db_upsert_finished",
+            {
+                "run_id": run_id,
+                **db_detail_result,
             },
         )
 
