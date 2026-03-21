@@ -32,8 +32,18 @@ Este documento centraliza os dados que vamos extrair na primeira versão do bot 
 - Preservar `Papel` em maiúsculo.
 - Campos vazios devem virar `null`.
 
+## Status Atual
+
+- Concluído: mapeamento e extração da tabela geral.
+- Concluído: extração de detalhes por ativo.
+- Concluído: normalização dos campos.
+- Concluído: snapshots JSON de execução.
+- Concluído: persistência em PostgreSQL com upsert.
+
 ## Próximos Passos
 
-- Mapear seletores reais da tabela no Fundamentus.
-- Implementar parser da linha HTML para este schema.
-- Definir destino inicial dos dados (`JSON/CSV` ou banco de dados).
+- Implementar camada de serviço para consumo na API (queries para dashboard).
+- Definir estratégia de agendamento do bot (cron/Celery).
+- Criar métricas de qualidade da coleta (null-rate, tempo médio, falhas por ativo).
+- Revisar nomenclatura de campos para padronização de domínio (pt/en).
+- Preencher documentação de metodologia (`doc/03-Metodologia.md`).
