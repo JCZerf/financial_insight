@@ -123,8 +123,18 @@ Leitura rápida:
   - `data/logs/ingestor.log`
   - `data/logs/extraction_audit.ndjson`
 
+## Observabilidade
+- Logs operacionais e de auditoria:
+  - `data/logs/ingestor.log`
+  - `data/logs/extraction_audit.ndjson`
+- Profiling de infraestrutura:
+  - `data/logs/docker_stats_YYYYMMDD_HHMMSS.csv`
+- Metricas detalhadas, linha de base operacional e leitura dos sinais:
+  - `doc/04-Observabilidade.md`
+
 ## Documentação
 - Controle de coleta: `doc/00-Controle-Coleta-FIIs.md`
 - Contexto: `doc/01-Documentação de Contexto.md`
 - Especificação: `doc/02-Especificação do Projeto.md`
-- Metodologia: `doc/03-Metodologia.md` (pendente de preenchimento)
+- Metodologia: `doc/03-Metodologia.md`
+- Observabilidade: `doc/04-Observabilidade.md`

@@ -111,3 +111,25 @@
 - Resultado observado nos testes:
   - `concurrency=2` em 512MB/1CPU opera no limite (CPU saturada e RAM muito próxima do teto).
   - `concurrency=1` aumenta estabilidade e completou o cenário de teste, mantendo CPU como gargalo principal.
+
+### 17) PostgreSQL como camada de leitura da aplicação
+- Foi definido que o bot de coleta nao sera executado sob demanda a cada consulta do usuario.
+- O bot tera papel de ingestao periodica: atualizar o snapshot mais recente dos FIIs no banco.
+- O PostgreSQL tera papel de camada de leitura da aplicacao, servindo API, dashboard e filtros sem necessidade de novo scraping a cada acesso.
+
+**Motivacao**
+- Executar scraping com Playwright em toda consulta tem custo maior de CPU, memoria e tempo de resposta.
+- A leitura via banco e mais barata e previsivel do que abrir navegador e depender do HTML da fonte em tempo real.
+- O desacoplamento entre coleta e consumo reduz dependencia operacional do Fundamentus durante o uso diario do sistema.
+- Em caso de falha temporaria na coleta, a aplicacao continua podendo servir o ultimo snapshot valido persistido.
+
+**Trade-off assumido**
+- Ganha-se desempenho, previsibilidade e menor custo operacional por consulta.
+- Em contrapartida, passa a existir custo fixo de manter o banco disponivel e aceita-se pequena defasagem entre a ultima coleta e o dado exibido.
+- Para a fase atual do projeto, esse trade-off foi considerado favoravel porque o objetivo e evitar scraping continuo e preparar consumo recorrente via aplicacao.
+
+**Implicacoes de arquitetura**
+- O bot passa a ser um processo agendado, e nao um componente de resposta online.
+- A API deve consultar prioritariamente o PostgreSQL, e nao acionar scraping em tempo real.
+- O schema atual com `ticker` unico atende bem ao objetivo de manter o estado mais recente de cada FII.
+- Historico temporal completo pode ser adicionado depois, caso o produto evolua para comparacao entre janelas ou alertas baseados em serie historica.
