@@ -58,6 +58,25 @@ docker compose up -d
 python manage.py migrate
 ```
 
+## Autenticacao Da API
+Baseado em `Django REST Framework` + `Djoser` + `SimpleJWT`.
+
+Rotas iniciais:
+- `POST /api/auth/users/`: cadastro de usuario
+- `POST /api/auth/jwt/create/`: login com email e senha
+- `POST /api/auth/jwt/refresh/`: renovacao do access token
+- `POST /api/auth/jwt/verify/`: validacao de token
+- `GET /api/auth/users/me/`: dados do usuario autenticado
+
+Politica de tokens:
+- `access_token`: `15 minutos`
+- `refresh_token`: `7 dias`
+
+Header de autenticacao:
+```http
+Authorization: Bearer <access_token>
+```
+
 ## Executando O Bot
 Execução completa (geral + detalhes):
 ```bash
@@ -139,3 +158,4 @@ Leitura rápida:
 - Metodologia: `doc/03-Metodologia.md`
 - Observabilidade: `doc/04-Observabilidade.md`
 - Modelo de dados: `doc/05-Modelo-de-Dados.md`
+- Autenticação: `doc/06-Autenticacao.md`

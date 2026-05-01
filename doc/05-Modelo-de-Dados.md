@@ -7,10 +7,45 @@ Documentacao tecnica das tabelas de dominio persistidas pela aplicacao.
 ## Relacionamentos
 
 ```text
+account_user
+
 real_estate_fund (1) ----- (1) real_estate_fund_detail
 
 real_estate_fund_detail.fund_id -> real_estate_fund.id
 ```
+
+## Tabela `account_user`
+
+**Descricao**
+
+Armazena os usuarios autenticaveis da API.
+
+**Chaves e restricoes**
+
+| Item | Definicao |
+|---|---|
+| Chave primaria | `id` |
+| Chave unica | `email` |
+| Chave unica | `cpf` |
+| Indice | `idx_account_user_email (email)` |
+| Indice | `idx_account_user_cpf (cpf)` |
+| Indice | `idx_account_user_status (is_active, is_authorized)` |
+
+**Campos**
+
+| Campo | Tipo | Nulo | Chave/Indice | Descricao |
+|---|---|---:|---|---|
+| `id` | `bigint` | Nao | PK | Identificador interno do usuario. |
+| `password` | `varchar(128)` | Nao |  | Hash de senha gerado pelo Django. |
+| `last_login` | `timestamp with time zone` | Sim |  | Data do ultimo login bem-sucedido. |
+| `email` | `varchar(254)` | Nao | UNIQUE, Indexado | Identificador de login do usuario. |
+| `name` | `varchar(255)` | Nao |  | Nome completo do usuario. |
+| `birth_date` | `date` | Nao |  | Data de nascimento do usuario. |
+| `cpf` | `varchar(11)` | Nao | UNIQUE, Indexado | CPF normalizado com 11 digitos. |
+| `is_active` | `boolean` | Nao | Indice composto | Indica se o usuario pode autenticar. |
+| `is_staff` | `boolean` | Nao |  | Indica acesso ao admin Django. |
+| `is_authorized` | `boolean` | Nao | Indice composto | Flag de autorizacao operacional da aplicacao. |
+| `date_joined` | `timestamp with time zone` | Nao |  | Data de criacao da conta. |
 
 ## Tabela `real_estate_fund`
 
@@ -136,8 +171,7 @@ Armazena o snapshot atual dos dados detalhados de cada FII extraidos da pagina i
 | `auth_permission` | Permissoes do framework. |
 | `auth_group` | Grupos de usuarios. |
 | `auth_group_permissions` | Relacao entre grupos e permissoes. |
-| `auth_user` | Usuarios do sistema. |
-| `auth_user_groups` | Relacao entre usuarios e grupos. |
-| `auth_user_user_permissions` | Relacao entre usuarios e permissoes. |
+| `account_user_groups` | Relacao entre usuarios e grupos. |
+| `account_user_user_permissions` | Relacao entre usuarios e permissoes. |
 | `django_admin_log` | Log do admin Django. |
 | `django_session` | Sessoes persistidas. |
