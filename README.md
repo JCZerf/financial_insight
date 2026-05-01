@@ -77,6 +77,11 @@ Header de autenticacao:
 Authorization: Bearer <access_token>
 ```
 
+Documentacao interativa:
+- `GET /api/docs/`: Swagger UI
+- `GET /api/redoc/`: ReDoc
+- `GET /api/schema/`: schema OpenAPI
+
 ## Executando O Bot
 Execução completa (geral + detalhes):
 ```bash

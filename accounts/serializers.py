@@ -19,6 +19,8 @@ class UserSerializer(BaseUserSerializer):
 
 
 class UserCreateSerializer(BaseUserCreateSerializer):
+    re_password = serializers.CharField(write_only=True)
+
     class Meta(BaseUserCreateSerializer.Meta):
         model = User
         fields = ("id", "email", "name", "birth_date", "cpf", "password", "re_password")
