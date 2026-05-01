@@ -138,3 +138,4 @@ Leitura rápida:
 - Especificação: `doc/02-Especificação do Projeto.md`
 - Metodologia: `doc/03-Metodologia.md`
 - Observabilidade: `doc/04-Observabilidade.md`
+- Modelo de dados: `doc/05-Modelo-de-Dados.md`
