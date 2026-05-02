@@ -27,7 +27,7 @@ from accounts.auth_views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/users/', AuthUserViewSet.as_view({'post': 'create'}), name='auth-register'),
-    path('api/auth/users/me/', AuthUserViewSet.as_view({'get': 'me'}), name='auth-me'),
+    path('api/auth/users/me/', AuthUserViewSet.as_view({'get': 'me', 'put': 'me', 'patch': 'me'}), name='auth-me'),
     path('api/auth/jwt/create/', DocumentedTokenObtainPairView.as_view(), name='auth-jwt-create'),
     path('api/auth/jwt/refresh/', DocumentedTokenRefreshView.as_view(), name='auth-jwt-refresh'),
     path('api/auth/jwt/verify/', DocumentedTokenVerifyView.as_view(), name='auth-jwt-verify'),

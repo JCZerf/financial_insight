@@ -76,6 +76,48 @@ EmptyResponseSerializer = inline_serializer(
         summary="Get current user",
         description="Returns the authenticated user profile associated with the access token.",
         responses={200: UserSerializer},
+        examples=[
+            OpenApiExample(
+                "User response",
+                value={
+                    "id": 1,
+                    "email": "ana@example.com",
+                    "name": "Ana Silva",
+                    "birth_date": "1995-08-12",
+                    "cpf": "12345678909",
+                },
+                response_only=True,
+            )
+        ],
+    ),
+    partial_update=extend_schema(
+        tags=["Authentication"],
+        summary="Update current user (partial)",
+        description="Updates one or more fields of the authenticated user profile. Use PATCH to update only specific fields.",
+        request=UserSerializer,
+        responses={200: UserSerializer},
+        examples=[
+            OpenApiExample(
+                "Update name",
+                value={"name": "Ana Carolina Silva"},
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Update email and name",
+                value={
+                    "email": "anacarolina@example.com",
+                    "name": "Ana Carolina Silva",
+                },
+                request_only=True,
+            )
+        ],
+    ),
+    update=extend_schema(
+        tags=["Authentication"],
+        summary="Update current user (full)",
+        description="Updates all fields of the authenticated user profile. Use PUT to replace the entire resource.",
+        request=UserSerializer,
+        responses={200: UserSerializer},
     ),
 )
 class AuthUserViewSet(UserViewSet):
