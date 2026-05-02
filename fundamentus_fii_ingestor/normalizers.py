@@ -128,6 +128,6 @@ def normalize_fii_detail(raw_detail: dict[str, Any]) -> dict[str, Any]:
             "rent_per_sqm": parse_br_number(_first(labels.get("Aluguel/m2"))),
             "cap_rate": parse_br_percent(_first(labels.get("Cap Rate"))),
             "avg_vacancy": parse_br_percent(_first(labels.get("Vacância Média"))),
-            "properties_to_equity_percent": parse_br_percent(_first(labels.get("Imóveis/PL do FII"))),
+            "to_equity_percent": parse_br_percent(_first(labels.get("Imóveis/PL do FII"))),
         },
     }

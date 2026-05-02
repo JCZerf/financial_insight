@@ -232,7 +232,7 @@ def _detail_tuple(
         properties.get("rent_per_sqm"),
         properties.get("cap_rate"),
         properties.get("avg_vacancy"),
-        properties.get("properties_to_equity_percent"),
+        properties.get("to_equity_percent"),
         now_dt,
         now_dt,
     )
