@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from accounts.auth_views import (
     AuthUserViewSet,
@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/auth/jwt/create/', DocumentedTokenObtainPairView.as_view(), name='auth-jwt-create'),
     path('api/auth/jwt/refresh/', DocumentedTokenRefreshView.as_view(), name='auth-jwt-refresh'),
     path('api/auth/jwt/verify/', DocumentedTokenVerifyView.as_view(), name='auth-jwt-verify'),
+    path('api/', include('api.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='api-schema'), name='api-docs'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='api-schema'), name='api-redoc'),
