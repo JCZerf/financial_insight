@@ -1,4 +1,5 @@
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -101,6 +102,43 @@ class DashboardApiTests(TestCase):
         self.assertEqual(payload["ticker"], "GOOD11")
         self.assertEqual(payload["detail"]["identification"]["name"], "Good Fundo Imobiliario")
         self.assertEqual(payload["detail"]["indicators"]["price_to_book"], 0.92)
+
+    def test_admin_ingestion_requires_superuser(self):
+        response = self.client.post(
+            "/api/admin/ingestion/run/",
+            {"mode": "basic"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    @patch("api.views.run_manual_ingestion")
+    def test_superuser_can_run_admin_ingestion(self, run_manual_ingestion_mock):
+        superuser = get_user_model().objects.create_superuser(
+            email="admin@example.com",
+            name="Admin Teste",
+            birth_date="1990-01-01",
+            cpf="98765432100",
+            password="StrongPassword123!",
+        )
+        self.client.force_authenticate(superuser)
+        run_manual_ingestion_mock.return_value = {
+            "mode": "detailed",
+            "run_id": "run-123",
+            "total_raw_rows": 3,
+            "general_total": 3,
+            "details_total": 3,
+        }
+
+        response = self.client.post(
+            "/api/admin/ingestion/run/",
+            {"mode": "detailed", "limit": 3},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["run_id"], "run-123")
+        run_manual_ingestion_mock.assert_called_once_with(detailed=True, limit=3)
 
     def create_fund(
         self,

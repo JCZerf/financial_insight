@@ -3,9 +3,11 @@ from decimal import Decimal, InvalidOperation
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api.admin_services import IngestionAlreadyRunningError, run_manual_ingestion
 from api.models import RealEstateFund
 from api.serializers import (
     DashboardResponseSerializer,
@@ -21,6 +23,11 @@ from api.services import (
     parse_limit,
     rank_funds,
 )
+
+
+class IsSuperAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_superuser)
 
 
 FILTER_PARAMETERS = [
@@ -136,3 +143,73 @@ class FundDetailView(APIView):
             ticker__iexact=ticker,
         )
         return Response(fund_detail_payload(fund))
+
+
+class AdminIngestionRunView(APIView):
+    permission_classes = [IsSuperAdmin]
+
+    @extend_schema(
+        tags=["Administration"],
+        operation_id="admin_ingestion_run",
+        summary="Run FII ingestion manually",
+        description=(
+            "Runs the Fundamentus FII ingestion manually. "
+            "Use mode=basic for general data only or mode=detailed for general data plus detail pages. "
+            "Restricted to superusers."
+        ),
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "mode": {
+                        "type": "string",
+                        "enum": ["basic", "detailed"],
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "nullable": True,
+                    },
+                },
+                "required": ["mode"],
+            }
+        },
+        responses={200: dict, 400: dict, 403: dict, 409: dict},
+    )
+    def post(self, request):
+        mode = request.data.get("mode")
+        if mode not in {"basic", "detailed"}:
+            return Response(
+                {"detail": "Mode must be 'basic' or 'detailed'."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        limit = request.data.get("limit")
+        if limit in ("", None):
+            parsed_limit = None
+        else:
+            try:
+                parsed_limit = int(limit)
+            except (TypeError, ValueError):
+                return Response(
+                    {"detail": "Limit must be a positive integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if parsed_limit <= 0:
+                return Response(
+                    {"detail": "Limit must be a positive integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        try:
+            result = run_manual_ingestion(
+                detailed=mode == "detailed",
+                limit=parsed_limit,
+            )
+        except IngestionAlreadyRunningError:
+            return Response(
+                {"detail": "An ingestion is already running."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(result)

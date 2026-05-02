@@ -14,8 +14,8 @@ User = get_user_model()
 class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = User
-        fields = ("id", "email", "name", "birth_date", "cpf", "is_authorized")
-        read_only_fields = ("id", "is_authorized")
+        fields = ("id", "email", "name", "birth_date", "cpf", "is_authorized", "is_staff", "is_superuser")
+        read_only_fields = ("id", "is_authorized", "is_staff", "is_superuser")
 
 
 class UserCreateSerializer(BaseUserCreateSerializer):
