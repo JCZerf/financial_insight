@@ -169,6 +169,44 @@ O FinancialInsight está alinhado com a proposta de democratização do acesso �
 
 A proposta representa uma evolução em relação aos métodos tradicionais de análise manual, integrando automação, organização de dados e visualização inteligente para apoiar o investidor na tomada de decisões mais rápidas e fundamentadas.
 
+## Critérios de Classificação dos FIIs
+
+A classificação dos Fundos Imobiliários no FinancialInsight tem como objetivo apoiar a triagem inicial de oportunidades, organizando os ativos com base em critérios objetivos e comparáveis. A pontuação não representa recomendação personalizada de investimento, não substitui análise individual do investidor e não considera perfil de risco, objetivos financeiros, carteira atual ou horizonte de investimento do usuário.
+
+O ranking considera três dimensões principais:
+
+- **Rendimento:** avalia o Dividend Yield do fundo, indicando a relação entre os rendimentos distribuídos e o preço da cota. Fundos com maior rendimento tendem a receber maior pontuação nesse critério, desde que possuam dados válidos.
+- **Preço vs Patrimônio:** avalia o indicador P/VP, que compara o preço de mercado da cota com seu valor patrimonial. Fundos negociados abaixo ou próximos do valor patrimonial tendem a receber melhor pontuação nesse critério.
+- **Liquidez:** avalia o volume médio negociado, indicando a facilidade de compra e venda do ativo no mercado. Fundos com maior liquidez tendem a receber maior pontuação, pois apresentam melhor capacidade de negociação.
+
+### Pesos da Pontuação
+
+Para compor a pontuação final, cada critério recebe um peso conforme sua relevância na triagem inicial:
+
+| Critério | Peso |
+|----------|------|
+| Dividend Yield | 45% |
+| Preço vs Patrimônio (P/VP) | 35% |
+| Liquidez | 20% |
+
+A pontuação final é calculada pela combinação ponderada dos três fatores. Dessa forma, o ranking favorece fundos que apresentem bom equilíbrio entre geração de renda, preço atrativo em relação ao patrimônio e facilidade de negociação.
+
+### Regras de Elegibilidade
+
+Para participar do ranking, o fundo deve possuir dados válidos para os três critérios utilizados na pontuação:
+
+- Dividend Yield informado e maior que zero  
+- P/VP informado e maior que zero  
+- Liquidez informada e maior que zero  
+
+Fundos com dados ausentes, zerados ou inconsistentes podem continuar disponíveis nas listagens e telas de detalhe, mas não devem ser priorizados no ranking de oportunidades enquanto não possuírem informações suficientes para cálculo comparável.
+
+### Interpretação da Pontuação
+
+A pontuação deve ser interpretada como um indicador de triagem, isto é, um mecanismo para reduzir o universo de análise e destacar ativos que merecem atenção inicial. Uma pontuação elevada indica aderência aos critérios definidos pelo sistema, mas não garante qualidade futura do investimento, retorno financeiro ou adequação ao perfil do usuário.
+
+O usuário deve utilizar o ranking em conjunto com a análise detalhada do fundo, considerando informações adicionais como segmento, vacância, patrimônio, resultados financeiros, gestão, histórico e demais fatores relevantes para sua decisão.
+
 
 ## Processos do Sistema
 
