@@ -17,6 +17,27 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financial_insight_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_DB: financial_insight
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DJANGO_SETTINGS_MODULE: financial_insight.settings
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+
   ingestor:
     build:
       context: .
@@ -39,3 +60,5 @@ services:
 
 volumes:
   pgdata_financial_insight:
+    external: true
+    name: financial_insight_pgdata_financial_insight
